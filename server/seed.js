@@ -4,11 +4,20 @@ import connectDB from './db/connection.js'
 
 const register = async ()=>{
     try{
-        connectDB()
+        await connectDB()
+        const email = 'admin@gmail.com'
+
+        // Check whether the admin already exists
+        const existingUser = await User.findOne({ email });
+
+        if (existingUser) {
+            console.log('Admin User already exists!');
+        return;
+    }
         const hashPassword = await bcrypt.hash("admin", 10)
         const newUser = new User({
             name : "admin",
-            email : "admin@gmail.com",
+            email : email,
             password : hashPassword,
             address : "admin address",
             role : "admin"
@@ -17,7 +26,9 @@ const register = async ()=>{
         console.log("Admin User created succesfully")
     }
     catch(error){
-        console.log(error)
-    }
+        console.error('Error creating admin user:',error.message)
+    // }finally {
+    // await mongoose.disconnect();
+  }
 }
 register()
